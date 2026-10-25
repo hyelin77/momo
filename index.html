@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>모모 프로필</title>
+    <style>
+        /* === 나무위키 기본 테마 및 테두리/색상 정의 === */
+        :root {
+            --namu-green: #008275;      /* 나무위키 시그니처 초록색 */
+            --namu-dark-green: #005f55;
+            --namu-bg: #ffffff;
+            --namu-gray-bg: #f5f5f5;
+            --namu-border: #ccc;
+            --namu-text: #373a3c;
+            --namu-link: #0275d8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: var(--namu-text);
+            background-color: #f2f2f2;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        a {
+            color: var(--namu-link);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        /* === 상단 헤더 === */
+        header {
+            background-color: var(--namu-green);
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .search-bar input {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            outline: none;
+            width: 200px;
+        }
+
+        /* === 메인 레이아웃 === */
+        .container {
+            max-width: 1100px;
+            margin: 20px auto;
+            background: var(--namu-bg);
+            padding: 25px 30px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        /* 문서 제목 */
+        .doc-title {
+            font-size: 32px;
+            font-weight: normal;
+            border-bottom: 2px solid var(--namu-green);
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .doc-tools {
+            font-size: 13px;
+        }
+
+        .doc-tools a {
+            margin-left: 8px;
+            color: #666;
+            background: #eee;
+            padding: 4px 8px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+
+        /* 레이아웃 분할 (본문 + 우측 프로필 인포박스) */
+        .content-wrapper {
+            display: flex;
+            flex-direction: row-reverse; /* 인포박스를 우측에 배치 */
+            align-items: flex-start;    /* 우측 인포박스가 늘어나지 않고 내용 크기대로 유지 */
+            gap: 20px;
+        }
+
+        /* === 프로필 인포박스 (나무위키 특유 테이블) === */
+        .infobox {
+            width: 320px;
+            border: 2px solid var(--namu-green);
+            border-collapse: collapse;
+            font-size: 13px;
+            float: right;
+            margin-top: 5px;
+            margin-bottom: 25px;
+            background: #fff;
+        }
+
+        .infobox th, .infobox td {
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+        }
+
+        .infobox .title {
+            background-color: var(--namu-green);
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+        }
+
+        .infobox .image-cell {
+            text-align: center;
+            background-color: #fff;
+            padding: 10px;
+        }
+
+        .infobox .image-cell img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .infobox th {
+            background-color: #f0f8f7;
+            color: var(--namu-dark-green);
+            width: 30%;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        .main-text {
+            flex: 1;
+            min-width: 0; /* flex 자식 넘침 방지 */
+        }
+
+        /* === 목차 (TOC) === */
+        .toc {
+            background-color: var(--namu-gray-bg);
+            border: 1px solid var(--namu-border);
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+            min-width: 250px;
+        }
+
+        .toc-title {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 3px;
+        }
+
+        .toc ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            margin: 3px 0;
+        }
+
+        .toc .toc-num {
+            color: var(--namu-green);
+            font-weight: bold;
+        }
+
+        /* === 문단 제목 (Heading) === */
+        h2 {
+            font-size: 20px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        h2 .wiki-num {
+            color: var(--namu-green);
+        }
+
+        h3 {
+            font-size: 16px;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        h3 .wiki-num {
+            color: var(--namu-green);
+        }
+
+        p {
+            margin-bottom: 12px;
+        }
+
+        /* 스포일러 토글 접기/펴기 스타일 */
+        /* .spoiler-details {
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #fafafa;
+        } */
+
+        .spoiler-details summary {
+            cursor: pointer;
+            padding: 6px 12px;
+            font-weight: bold;
+            color: black;
+            /* background-color: #f2f2f2;
+            border-radius: 4px; */
+            user-select: none;
+            outline: none;
+        }
+
+        /* .spoiler-details summary:hover {
+            background-color: #e8e8e8;
+        }
+
+        .spoiler-content {
+            padding: 12px 15px 4px 15px;
+        } */
+
+        /* 강조 박스 / 인용구 */
+        .wiki-quote {
+            border-left: 4px solid var(--namu-green);
+            background-color: #f9f9f9;
+            padding: 10px 15px;
+            margin: 10px 0;
+            font-style: italic;
+        }
+
+        /* 각주 스타일 */
+        .footnote-ref {
+            font-size: 11px;
+            vertical-align: super;
+            color: var(--namu-link);
+            font-weight: bold;
+        }
+
+        .footnotes {
+            margin-top: 40px;
+            border-top: 2px solid #ddd;
+            padding-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* 반응형 (모바일 대응) */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+            .infobox {
+                width: 100%;
+                float: none;
+                margin-top: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">Momo</div>
+    </header>
+
+    <div class="container">
+        <div class="doc-title">
+            <span><b>모모</b></span>
+        </div>
+
+        <div class="content-wrapper">
+            
+            <table class="infobox">
+                <tr>
+                    <th colspan="2" class="title">츠바키 모모<br><span style="font-size: 12px; font-weight: normal;">Tsubaki Momo</span></th>
+                </tr>
+                <tr>
+                    <td colspan="2" class="image-cell">
+                        <img src="https://lh3.googleusercontent.com/d/1lXKSecTZBKOMVyssVdjDnHA5eWyxVYUX" alt="프로필 사진">
+                    </td>
+                </tr>
+                <tr>
+                    <th>이름</th>
+                    <td>츠바키 모모 椿 桃(つばきもも)</td>
+                </tr>
+                <tr>
+                    <th>성별</th>
+                    <td>남성</td>
+                </tr>
+                <tr>
+                    <th>나이</th>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <th>소속</th>
+                    <td>제 7사단</td>
+                </tr>
+                <tr>
+                    <th>계급</th>
+                    <td>상등병</td>
+                </tr>
+                <tr>
+                    <th>신장</th>
+                    <td>178cm, 돼지</td>
+                </tr>
+                <tr>
+                    <th>가족</th>
+                    <td>X</td>
+                </tr>
+            </table>
+
+            <div class="main-text">
+                
+
+                <div class="toc">
+                    <div class="toc-title">목차</div>
+                    <ul>
+                        <li><a href="#s-1"><span class="toc-num">1.</span> 개요</a></li>
+                        <li><a href="#s-2"><span class="toc-num">2.</span> 작중 행적</a></li>
+                        <li>
+                            <a href="#s-3"><span class="toc-num">3.</span> 과거</a>
+                            <ul>
+                                <li><a href="#s-3-1"><span class="toc-num">3.1.</span> 과거[스포일러]</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#s-4"><span class="toc-num">4.</span> 인간관계</a>
+                            <ul>
+                                <li><a href="#s-4-1"><span class="toc-num">4.1.</span> 츠루미 토쿠시로</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-2"><span class="toc-num">4.2.</span> 오가타 햐쿠노스케</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-3"><span class="toc-num">4.3.</span> 우사미 토키시게</a></li>
+                            </ul>
+                            <ul>
+                                <li><a href="#s-4-4"><span class="toc-num">4.4.</span> 히무로 모토아키</a></li>
+                            </ul>
+                        </li>
+                        <li><a href="#s-5"><span class="toc-num">5.</span> 기타</a></li>
+                    </ul>
+                </div>
+
+                <h2 id="s-1"><span class="wiki-num">1.</span> 개요</h2>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/16ArPwJRWl27fjvZuqUs5nHhaRpss6sC3" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;">▲ 전체적인 인상</p>
+                </div>
+                <p>만화 <a href="https://namu.wiki/w/%EA%B3%A8%EB%93%A0%20%EC%B9%B4%EB%AC%B4%EC%9D%B4">골든 카무이</a>의 등장인물로, 
+                    홋카이도 주둔 제7사단 소속으로 27연대 <a href="https://namu.wiki/w/%EC%B8%A0%EB%A3%A8%EB%AF%B8%20%EC%A4%91%EC%9C%84">츠루미 중위</a> 소대 소속 상등병이다. 풀네임은 <b>츠바키 모모(椿 桃).</b> 일반 호칭은 '츠바키 상등병'이나 
+                        츠루미와 <a href="https://namu.wiki/w/%EC%9A%B0%EC%82%AC%EB%AF%B8%20%EC%83%81%EB%93%B1%EB%B3%91">우사미</a>에게는 '모모'라고 불린다.
+                    </p>
+                <br>
+                <p>전체적으로 쎄한 미형으로, 확장된 듯 크고 검은 눈동자와 멍한 표정으로 허공이나 상대를 가만히 응시하는 기묘한 눈빛이 특징이다. 하관은 피부가 벗겨진 상태이다. 키는 175cm로, 지방 근육으로 이루어진 덩치가 있는 체형이다.</p>
+                <p>과거 전쟁터에서 일어난 폭탄 사고로 인해 혀의 절반 이상과 윗입술이 날라갔다. 이로 인해 제대로 된 언어를 구사하지 못하며, 입을 열어도 짧고 뭉개진 음성과 웅얼거리는 소리만 낼 수 있다. 윗입술이 날라간 탓에 입을 다무는 게 어려워 물이 새어 나가는 경우가 많다.</p>
+                <br>
+                <p>작중 포지션은 <a href="https://namu.wiki/w/%EC%98%A4%EA%B0%80%ED%83%80%20%ED%96%90%EC%BF%A0%EB%85%B8%EC%8A%A4%EC%BC%80">오가타</a>, 우사미와 같은 사고 뭉치 관리 대상자로 반사회적인 성격을 띄고 있다. 어눌한 발음임에도 상대를 모욕하려는 의지가 투철하다.</p>
+                <br>
+                <p>언제나 삐뚤어진 성격이지만 어눌한 발음으로 인해 모두 표현할 수 없어 항상 이골이 나 있다. 감정 상태에 상관 없이 표정은 대부분 온화하고 부드러운 미소를 띄고 있다.</p>
+                <br>
+                <p>근접 격투에 특화되어 있으며, 수단을 가리지 않고 비열하게 싸운다. 손이 빨라 무기를 뺏거나 공격의 궤도를 바꾸는 등 뛰어난 전투 센스와 비상한 두뇌로 
+                    상대를 무력화시키는 재능이 뛰어나다. 답이 없으면 물어 뜯는데, 치악력이 매우 강해 데미지가 상당하다. 이빨로 철창까지 휘게 하는 괴인. 이빨 또한 소중한 무기이기에 항상 뾰족하게 다듬고 관리한다.</p>
+                <p>전투력은 중상. 다만 전투 중 감정이 격해져 과도하게 흥분하는 경향이 있어 상대와 고전하게 되면 온갖 수단을 사용해 패 죽이고자 한다.</p>
+
+                <h2 id="s-2"><span class="wiki-num">2.</span> 작중 행적</h2>
+                <p>단행본 25권에서 처음 등장하였다. 시점 자체는 1권 이후 회복중인 오가타의 병실이며, 우사미와 함께 강에 빠진 오가타를 간호하는 모습으로 나온다. 이 과정에서 
+                    오가타의 환자복이 찢어지는 해프닝이 있었으나, 결과적으로는 아무 일 없이 마무리되었다.
+                </p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p></p>
+                    </div>
+                </details>
+                <br>
+                <p></p>
+
+
+                <h2 id="s-3"><span class="wiki-num">3.</span> 과거</h2>
+                <p></p>
+
+                <h3 id="s-3-1"><span class="wiki-num">3.1.</span> 과거[스포일러]</h3>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p></p>
+                    </div>
+                </details>
+
+                <h2 id="s-4"><span class="wiki-num">4.</span> 인간관계</h2>
+                <h3 id="s-4-1"><span class="wiki-num">4.1.</span> <a href="https://namu.wiki/w/%EC%B8%A0%EB%A3%A8%EB%AF%B8%20%EC%A4%91%EC%9C%84?from=%EC%B8%A0%EB%A3%A8%EB%AF%B8%20%ED%86%A0%EC%BF%A0%EC%8B%9C%EB%A1%9C">츠루미 토쿠시로</a></h3>
+                <p></p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p></p>
+                    </div>
+                </details>
+                <br>
+                
+                <h3 id="s-4-2"><span class="wiki-num">4.2.</span> <a href="https://namu.wiki/w/%EC%98%A4%EA%B0%80%ED%83%80%20%ED%96%90%EC%BF%A0%EB%85%B8%EC%8A%A4%EC%BC%80">오가타 햐쿠노스케</a></h3>
+                <p></p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p></p>
+                    </div>
+                </details>
+                <br>
+                
+                <h3 id="s-4-3"><span class="wiki-num">4.3.</span> <a href="https://namu.wiki/w/%EC%9A%B0%EC%82%AC%EB%AF%B8%20%EC%83%81%EB%93%B1%EB%B3%91">우사미 토키시게</a></h3>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/모모" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                </div>
+                <p></p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <div style="text-align: center; margin: 15px 0;">
+                            <img src="https://lh3.googleusercontent.com/d/모모" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                        </div>
+                        
+                                <p></p>
+                    </div>
+                </details>
+                <br>
+
+                <h3 id="s-4-4"><span class="wiki-num">4.4.</span> <a href="https://himuro-profile.netlify.app/">히무로 모토아키</a></h3>
+                <div style="text-align: center; margin: 15px 0;">
+                    <img src="https://lh3.googleusercontent.com/d/모모" alt="" style="max-width: 100%; height: auto; border-radius: 4px; border: 1px solid #ddd;">
+                </div>
+                <p></p>
+                <br>
+                <details class="spoiler-details">
+                    <summary>[스포일러]</summary>
+                    <div class="spoiler-content">
+                        <p></p>
+                    </div>
+                </details>
+                <br>
+
+                <h2 id="s-5"><span class="wiki-num">5.</span> 기타</h2>
+                <ul>
+                    <li><a href="https://namu.wiki/w/%EB%8F%BC%EC%A7%80">돼지</a>가 모티브이다. 시각이 어두운 대신 후각과 청각이 발달했다. 덩치가 크며 대부분이 근육이지만 지방이 많다 단단보다는 말랑한 편에 속한다.</li>
+                    <li>서열 의식이 강하다. 수평적인 분위기를 극도로 꺼리며, 위계질서가 투철한 군인 체제의 적임자이다. 하지만 자신보다 만만해보이면 위계 질서를 무시한 채 일단 깔고 보려 한다.</li>
+                    <li>해독 능력이 다른 사람에 비해 매우 뛰어나다. 독은 물론이고 알코올, 진정제, 마약 등도 통하지 않는다. 진통제 또한 효과가 없어 수술이나 처치 시에는 그냥 입에 수건을 물고 참는 편.</li>
+                    <li>지능이 높지만 고집이 센 탓에 태도가 반항적이다. 하지만 츠루미에 한해서는 예외적인 순종성을 보인다. 또한 압도적인 무력을 가진 자에게는 함부로 대들지 않는다
+                        (Ex. <a href="https://namu.wiki/w/%EC%B8%A0%ED%82%A4%EC%8B%9C%EB%A7%88%20%ED%95%98%EC%A7%80%EB%A9%94">츠키시마 중사</a>).</li>
+                </ul>
+
+                <div class="footnotes">
+                    <p id="fn-1"><a href="#ref-1">[1]</a></p>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
